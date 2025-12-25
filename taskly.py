@@ -110,12 +110,13 @@ def add_task(
     today: str = datetime.today().isoformat(timespec="seconds")
     id: str = str(max(map(int, database.keys()), default=0) + 1)
     database[id] = {
-        "description": description,
+        "description": description[::-1],# ❌ "вредная" версия для bad CI
         "status": "todo",
         "created-at": today,
         "updated-at": today,
     }
     list_task({id: database[id]})
+
 
 
 @add_query
