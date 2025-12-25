@@ -1,13 +1,33 @@
-name: Bad CI
+ name: Bad CI
 
 on:
   push:
-
-jobs:
-  bad_pipeline:
+    branches: [ main, bad-ci ]
+  pull_request:
+    branches: [ main, bad-ci ]   
+ jobs:
+  lint-and-format:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black
+
+      - name: Run linter (ruff)
+        run: ruff .
+
+      - name: Check code formatting (black)
+        run: black --check .
+   steps:
       - name: Clone repo
         uses: actions/checkout@v4
 
@@ -27,3 +47,4 @@ jobs:
       - name: Deploy
         run: |
           echo "Deploying to production"    # ❌ всегда, из любой ветки
+
