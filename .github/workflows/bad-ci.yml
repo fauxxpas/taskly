@@ -1,11 +1,12 @@
- name: Bad CI
+name: Bad CI
 
 on:
   push:
     branches: [ main, bad-ci ]
   pull_request:
-    branches: [ main, bad-ci ]   
- jobs:
+    branches: [ main, bad-ci ]
+
+jobs:
   lint-and-format:
     runs-on: ubuntu-latest
     steps:
@@ -17,7 +18,7 @@ on:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install linter and formatter
         run: |
           python -m pip install --upgrade pip
           pip install ruff black
@@ -27,24 +28,17 @@ on:
 
       - name: Check code formatting (black)
         run: black --check .
-   steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Install project dependencies  # ❌ без кеша, без контроля версий
+        run: pip install -r requirements.txt
+
+      - name: Run application  # ❌ “build” и “test” смешаны
+        run: python taskly.py --help
+
+      - name: Deploy  # ❌ выполняется всегда, из любой ветки
+        run: echo "Deploying to production"
+
+      - name: Install Python latest  # ❌ нефиксированная версия
         uses: actions/setup-python@v5
         with:
-          python-version: "latest"   # ❌ нефиксированная версия
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt   # ❌ без кеша, без контроля версий
-
-      - name: Run application
-        run: |
-          python taskly.py --help           # ❌ “build” и “test” смешаны
-
-      - name: Deploy
-        run: |
-          echo "Deploying to production"    # ❌ всегда, из любой ветки
-
+          python-version: "latest"
